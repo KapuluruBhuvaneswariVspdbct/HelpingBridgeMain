@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orphanage Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        label, input, select {
+            display: block;
+            margin-bottom: 10px;
+            width: calc(100% - 16px);
+            padding: 8px;
+        }
+        button {
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #successMessage {
+            display: none;
+            color: #4CAF50;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        #registeredOrphanages {
+            display: none;
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #registeredOrphanages h2 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+        #orphanageList {
+            list-style: none;
+            padding: 0;
+        }
+        #orphanageList li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        #orphanageList li strong {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+
+<form id="orphanageForm">
+    <h1>Orphanage Registration</h1>
+
+    <label for="name">Orphanage Name:</label>
+    <input type="text" id="name" required>
+
+    <label for="people">Number of People:</label>
+    <input type="number" id="people" required>
+
+    <label for="location">Location:</label>
+    <select id="location" required>
+        <option value="">-- Select Location --</option>
+        <optgroup label="Tirupati">
+            <option value="Tirupati">Tirupati (Main)</option>
+            <optgroup label="Tirumala Hills">
+                <option value="Tirumala Hills - Vaikuntam Queue Complex">Vaikuntam Queue Complex</option>
+                <option value="Tirumala Hills - Temple surroundings">Temple surroundings</option>
+                <option value="Tirumala Hills - Papavinasam">Papavinasam</option>
+            </optgroup>
+            <optgroup label="Renigunta">
+                <option value="Renigunta - Railway Station Area">Railway Station Area</option>
+                <option value="Renigunta - RTC Colony">RTC Colony</option>
+                <option value="Renigunta - Airport Road">Airport Road</option>
+            </optgroup>
+            <optgroup label="Tiruchanoor">
+                <option value="Tiruchanoor - Padmavathi Temple Road">Padmavathi Temple Road</option>
+                <option value="Tiruchanoor - Residential Area">Residential Area</option>
+            </optgroup>
+            <optgroup label="Kapilateertham">
+                <option value="Kapilateertham - Temple surroundings">Temple surroundings</option>
+                <option value="Kapilateertham - Market Road">Market Road</option>
+            </optgroup>
+            <optgroup label="Chandragiri">
+                <option value="Chandragiri - Fort Area">Fort Area</option>
+                <option value="Chandragiri - Bypass Road">Bypass Road</option>
+            </optgroup>
+            <optgroup label="Settipalli">
+                <option value="Settipalli - Main Road">Main Road</option>
+                <option value="Settipalli - Residential Zone">Residential Zone</option>
+            </optgroup>
+            <optgroup label="MR Palli">
+                <option value="MR Palli - Police Station Road">Police Station Road</option>
+                <option value="MR Palli - Housing Colony">Housing Colony</option>
+            </optgroup>
+            <optgroup label="RC Road">
+                <option value="RC Road - Hospitals">Hospitals</option>
+                <option value="RC Road - Shopping Area">Shopping Area</option>
+            </optgroup>
+            <optgroup label="Leelamahal">
+                <option value="Leelamahal - Signal Point">Signal Point</option>
+                <option value="Leelamahal - Bypass Junction">Bypass Junction</option>
+            </optgroup>
+        </optgroup>
+    </select>
+
+    <label for="phone">Phone Number:</label>
+    <input type="tel" id="phone">
+    <div>
+        <button type="button" id="sendCodeBtn" style="padding: 8px;">Send Code</button>
+    </div>
+
+    <label for="otp">Enter Code:</label>
+    <input type="text" id="otp" placeholder="Enter verification code" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+
+    <input type="hidden" id="latitude">
+    <input type="hidden" id="longitude">
+
+    <button type="submit">Register</button>
+    <div id="successMessage">✅ Registration Successful!</div>
+</form>
+
+<div id="registeredOrphanages">
+    <h2>Registered Orphanages</h2>
+    <ul id="orphanageList"></ul>
+</div>
+
+<script>
+    let sessionId = null;
+
+    document.getElementById('sendCodeBtn').addEventListener('click', () => {
+        const phone = document.getElementById('phone').value;
+        if (!phone.match(/^\d{10}$/)) {
+            alert("Please enter a valid 10-digit phone number.");
+            return;
+        }
+
+        fetch(`https://2factor.in/API/V1/2a0e1aa8-15fa-11f0-8b17-0200cd936042/SMS/${phone}/AUTOGEN`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.Status === "Success") {
+                    sessionId = data.Details;
+                    alert("Verification code sent to your phone.");
+                } else {
+                    alert("Failed to send code. Please try again.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("An error occurred while sending the code.");
+            });
+    });
+
+    document.getElementById('orphanageForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const otp = document.getElementById('otp').value;
+        if (!sessionId || !otp) {
+            alert("Please verify your phone number with the code.");
+            return;
+        }
+
+        fetch(`https://2factor.in/API/V1/2a0e1aa8-15fa-11f0-8b17-0200cd936042/SMS/VERIFY/${sessionId}/${otp}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.Status === "Success") {
+                    const newOrphanage = {
+                        name: document.getElementById('name').value,
+                        people: document.getElementById('people').value,
+                        place: document.getElementById('location').value,
+                        phone: document.getElementById('phone').value,
+                        email: document.getElementById('email').value,
+                        latitude: document.getElementById('latitude').value,
+                        longitude: document.getElementById('longitude').value
+                    };
+
+                    let storedOrphanages = JSON.parse(localStorage.getItem('orphanages')) || [];
+                    storedOrphanages.push(newOrphanage);
+                    localStorage.setItem('orphanages', JSON.stringify(storedOrphanages));
+
+                    document.getElementById('successMessage').style.display = 'block';
+
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                        window.location.href = 'listorph.html';
+                    }, 2000);
+                } else {
+                    alert("Invalid verification code.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("An error occurred during verification.");
+            });
+    });
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        document.getElementById('latitude').value = position.coords.latitude;
+        document.getElementById('longitude').value = position.coords.longitude;
+    }
+
+    function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+
+    window.onload = getLocation;
+</script>
+
+</body>
+</html>

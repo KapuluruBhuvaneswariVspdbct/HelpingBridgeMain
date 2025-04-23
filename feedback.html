@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=W, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html{
+            background-image: url(mother_teresa.jpg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+        .o{
+            font-size: 20px;
+            color:whitesmoke;
+            margin-top:1.5%;
+            margin-left: 50%;
+            position: fixed;
+            background-image: url(mother_teresa.jpg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+            
+        }
+       
+        h2{
+            color:darkkhaki;
+            margin-left: 50%;
+            font-size:40px;
+        }
+        .ooo{
+            color:black;
+            background-color:burlywood;
+            margin-top:30%;
+            margin-left:72.5%;
+            font-size: 14px;
+            border-width: 2px;
+            width: 100px;
+            border-radius: 30%;
+               height:53px;
+        }
+        .oooo{
+            color:black;
+            background-color:burlywood;
+            margin-top:1%;
+            margin-left:69.5%;
+            font-size: 14px;
+            border-width: 2px;
+            width: 200px;
+            border-radius: 30%;
+               height:53px;
+        }
+
+      #successMessage {
+            display: none;
+            color: green;
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="oo">FEEDBACK:</h2>
+    <textarea id="feedback" rows="14" cols="50" class="o" placeholder="PLEASE SHARE YOUR EXPERIENCE WITH US..."></textarea>
+    <button class="ooo" onclick="submitFeedback()"><h4><b>SUBMIT</b></h4></button>
+    <button class="oooo" onclick="window.location.href='about.html';">
+        <b>CHECK FEEDBACKS</b>
+    </button>
+    
+    <script>
+        function submitFeedback() {
+            var feedback = document.getElementById('feedback').value;
+            
+            if (feedback.trim() !== "") {
+                // Retrieve existing feedbacks from localStorage
+                var feedbacks = JSON.parse(localStorage.getItem('userFeedbacks')) || [];
+    
+                // Add new feedback
+                feedbacks.push(feedback);
+    
+                // Save updated feedback list
+                localStorage.setItem('userFeedbacks', JSON.stringify(feedbacks));
+    
+                alert("Your feedback has been submitted successfully!");
+                document.getElementById('feedback').value = ""; // Clear the textarea
+            } else {
+                alert("Please enter your feedback before submitting.");
+            }
+        }
+    </script>
+    
+</body>
+</html
